@@ -1,0 +1,161 @@
+-- Drop tables if they exist (to start clean)
+
+DROP TABLE Cards CASCADE CONSTRAINTS;
+DROP TABLE Transactions CASCADE CONSTRAINTS;
+DROP TABLE Loans CASCADE CONSTRAINTS;
+DROP TABLE Accounts CASCADE CONSTRAINTS;
+DROP TABLE Employees CASCADE CONSTRAINTS;
+DROP TABLE Branches CASCADE CONSTRAINTS;
+DROP TABLE Customers CASCADE CONSTRAINTS;
+
+-- =========================
+-- CUSTOMERS
+-- =========================
+CREATE TABLE Customers (
+    CustomerID NUMBER PRIMARY KEY,
+    FirstName VARCHAR2(50) NOT NULL,
+    LastName VARCHAR2(50) NOT NULL,
+    ContactNo VARCHAR2(15),
+    Email VARCHAR2(100) UNIQUE,
+    Address VARCHAR2(255),
+    DateOfBirth DATE
+);
+
+-- =========================
+-- BRANCHES
+-- =========================
+CREATE TABLE Branches (
+    BranchID NUMBER PRIMARY KEY,
+    BranchName VARCHAR2(100),
+    Location VARCHAR2(100)
+);
+
+-- =========================
+-- EMPLOYEES
+-- =========================
+CREATE TABLE Employees (
+    EmployeeID NUMBER PRIMARY KEY,
+    Name VARCHAR2(100),
+    Role VARCHAR2(50),
+    BranchID NUMBER,
+    CONSTRAINT fk_emp_branch
+        FOREIGN KEY (BranchID)
+        REFERENCES Branches(BranchID)
+);
+
+-- =========================
+-- ACCOUNTS
+-- =========================
+CREATE TABLE Accounts (
+    AccountID NUMBER PRIMARY KEY,
+    CustomerID NUMBER,
+    AccountType VARCHAR2(20) CHECK (AccountType IN ('Savings','Current')),
+    Balance NUMBER(12,2),
+    BranchID NUMBER,
+    OpenDate DATE,
+    CONSTRAINT fk_acc_customer
+        FOREIGN KEY (CustomerID)
+        REFERENCES Customers(CustomerID),
+    CONSTRAINT fk_acc_branch
+        FOREIGN KEY (BranchID)
+        REFERENCES Branches(BranchID)
+);
+
+-- =========================
+-- TRANSACTIONS
+-- =========================
+CREATE TABLE Transactions (
+    TransactionID NUMBER PRIMARY KEY,
+    AccountID NUMBER,
+    TransactionType VARCHAR2(20)
+        CHECK (TransactionType IN ('Deposit','Withdrawal','Transfer')),
+    Amount NUMBER(12,2),
+    TransactionDate DATE,
+    CONSTRAINT fk_trans_account
+        FOREIGN KEY (AccountID)
+        REFERENCES Accounts(AccountID)
+);
+
+-- =========================
+-- LOANS
+-- =========================
+CREATE TABLE Loans (
+    LoanID NUMBER PRIMARY KEY,
+    CustomerID NUMBER,
+    LoanType VARCHAR2(50),
+    LoanAmount NUMBER(12,2),
+    InterestRate NUMBER(5,2),
+    LoanStatus VARCHAR2(20)
+        CHECK (LoanStatus IN ('Approved','Pending','Rejected')),
+    CONSTRAINT fk_loan_customer
+        FOREIGN KEY (CustomerID)
+        REFERENCES Customers(CustomerID)
+);
+
+-- =========================
+-- CARDS
+-- =========================
+CREATE TABLE Cards (
+    CardID NUMBER PRIMARY KEY,
+    CustomerID NUMBER,
+    CardType VARCHAR2(20)
+        CHECK (CardType IN ('Debit','Credit')),
+    CardNumber VARCHAR2(20),
+    ExpiryDate DATE,
+    Status VARCHAR2(20)
+        CHECK (Status IN ('Active','Blocked','Expired')),
+    CONSTRAINT fk_card_customer
+        FOREIGN KEY (CustomerID)
+        REFERENCES Customers(CustomerID)
+);
+-- CUSTOMERS
+INSERT INTO Customers VALUES (1,'John','Doe','9876543210','john@gmail.com','Rajkot',TO_DATE('1995-05-10','YYYY-MM-DD'));
+INSERT INTO Customers VALUES (2,'Emma','Smith','9876543211','emma@gmail.com','Ahmedabad',TO_DATE('1993-03-12','YYYY-MM-DD'));
+INSERT INTO Customers VALUES (3,'David','Brown','9876543212','david@gmail.com','Surat',TO_DATE('1990-07-18','YYYY-MM-DD'));
+INSERT INTO Customers VALUES (4,'Sophia','Lee','9876543213','sophia@gmail.com','Baroda',TO_DATE('1998-09-25','YYYY-MM-DD'));
+INSERT INTO Customers VALUES (5,'Michael','Clark','9876543214','michael@gmail.com','Mumbai',TO_DATE('1992-11-30','YYYY-MM-DD'));
+
+-- BRANCHES
+INSERT INTO Branches VALUES (1,'Rajkot Main','Rajkot');
+INSERT INTO Branches VALUES (2,'Ahmedabad Central','Ahmedabad');
+
+-- EMPLOYEES
+INSERT INTO Employees VALUES (1,'Arjun Patel','Manager',1);
+INSERT INTO Employees VALUES (2,'Riya Shah','Clerk',2);
+
+-- ACCOUNTS
+INSERT INTO Accounts VALUES (101,1,'Savings',50000,1,SYSDATE);
+INSERT INTO Accounts VALUES (102,2,'Current',75000,2,SYSDATE);
+
+-- TRANSACTIONS
+INSERT INTO Transactions VALUES (1,101,'Deposit',10000,SYSDATE);
+INSERT INTO Transactions VALUES (2,102,'Withdrawal',5000,SYSDATE);
+
+-- LOANS
+INSERT INTO Loans VALUES (1,1,'Home Loan',500000,7.5,'Approved');
+INSERT INTO Loans VALUES (2,3,'Car Loan',300000,8.0,'Pending');
+
+-- CARDS
+INSERT INTO Cards VALUES (1,1,'Debit','1234567890123456',TO_DATE('2028-12-31','YYYY-MM-DD'),'Active');
+INSERT INTO Cards VALUES (2,2,'Credit','9876543210987654',TO_DATE('2027-10-31','YYYY-MM-DD'),'Active');
+
+COMMIT;
+-- Show all customers
+SELECT * FROM Customers;
+
+-- Customers not born on 12 May
+SELECT * FROM Customers
+WHERE TO_CHAR(DateOfBirth,'DD-MM') != '12-05';
+
+-- Accounts with balance between 20000 and 80000
+SELECT * FROM Accounts
+WHERE Balance BETWEEN 20000 AND 80000;
+
+-- Find customers with name starting with 'J'
+SELECT * FROM Customers
+WHERE FirstName LIKE 'J%';
+
+-- Total balance per branch
+SELECT BranchID, SUM(Balance) AS Total_Balance
+FROM Accounts
+GROUP BY BranchID;
