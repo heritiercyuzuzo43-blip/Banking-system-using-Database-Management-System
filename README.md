@@ -54,3 +54,81 @@ The system consists of **7 main tables**:
 ---
 
 ## 📁 Project Structure
+Banking-Database/
+│
+├── 01_create_tables.sql
+├── 02_insert_data.sql
+├── 03_queries.sql
+└── README.md
+
+---
+
+## ⚙️ Features Implemented
+
+### ✔ Table Creation
+- Proper use of `PRIMARY KEY`
+- `FOREIGN KEY` relationships
+- `CHECK` constraints
+- `UNIQUE` constraints
+
+### ✔ Data Manipulation
+- Insert sample banking records
+- Update and delete operations
+- Transaction commit control
+
+### ✔ Query Operations
+- Filtering using `LIKE` and `BETWEEN`
+- Aggregation using `SUM()` and `GROUP BY`
+- Date filtering
+- Real-time balance checks
+
+---
+
+## 📊 Sample Queries
+
+### Customers with names starting with 'J'
+```sql
+SELECT * FROM Customers
+WHERE FirstName LIKE 'J%';
+SELECT * FROM Accounts
+WHERE Balance BETWEEN 20000 AND 80000;
+SELECT BranchID, SUM(Balance)
+FROM Accounts
+GROUP BY BranchID;
+🚀 Learning Outcomes
+
+Through this project, I gained practical knowledge in:
+
+Relational database design
+
+Normalization concepts
+
+Constraint implementation
+
+Query optimization basics
+
+Real-world banking system modeling
+
+📌 Future Improvements
+
+Implement Stored Procedures
+
+Add Triggers for automatic transaction logging
+
+Create Views for reporting
+
+Add Indexing for performance optimization
+
+Integrate with a front-end application
+
+👨‍💻 Author
+
+Cyuzuzo Twizere Heritier
+B.Sc. IT – Marwadi University
+Aspiring IT Analyst | Database & Cybersecurity Enthusiast
+
+⭐ Conclusion
+
+This project demonstrates a structured and scalable banking database system built using Oracle SQL, ensuring data integrity, security, and efficient transaction management.
+
+If you found this project helpful, feel free to ⭐ the repository!
